@@ -1,0 +1,59 @@
+eval "$(starship init zsh)"
+export PATH=~/bin:$PATH
+
+. "$HOME/.asdf/asdf.sh"
+export ASDF_DEFAULT_TOOL_VERSIONS_FILENAME=.global-tool-versions
+# append completions to fpath
+fpath=(${ASDF_DIR}/completions $fpath)
+# initialise completions with ZSH's compinit
+
+# case-insensitive completions
+zstyle ':completion:*' matcher-list 'm:{[:lower:][:upper:]}={[:upper:][:lower:]}' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*' 'm:{[:lower:][:upper:]}={[:upper:][:lower:]} l:|=* r:|=*'
+
+autoload -Uz compinit && compinit
+autoload zmv
+
+eval "$(direnv hook zsh)"
+
+# history setup
+setopt SHARE_HISTORY
+HISTFILE=$HOME/.zhistory
+SAVEHIST=10000
+HISTSIZE=9999
+setopt HIST_EXPIRE_DUPS_FIRST
+
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+
+autoload -U history-search-end
+zle -N history-beginning-search-backward-end history-search-end
+zle -N history-beginning-search-forward-end history-search-end
+
+bindkey '\e[A' history-beginning-search-backward-end
+bindkey '\e[B' history-beginning-search-forward-end
+
+alias be="bundle exec"
+alias ber="bundle exec rake"
+alias bep="bundle exec pry"
+alias bers="bundle exec rspec"
+source /Users/philschalm/.config/op/plugins.sh
+
+export EDITOR=nvim
+export VISUAL_EDITOR=nvim
+
+preexec () {
+  local action="$1"
+  if [[ $VSCODE == true ]]; then
+     print -Pn '\033]0;$action\007'
+  fi
+}
+
+precmd () {
+  if [[ $VSCODE == true ]]; then
+     print -Pn '\033]0; \007'
+  fi
+}
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+
+source /Users/philschalm/.config/broot/launcher/bash/br
